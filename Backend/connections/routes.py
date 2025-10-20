@@ -158,18 +158,25 @@ async def chat_message(message: ChatMessage):
 async def get_all_leads():
     """Get all leads"""
     try:
-        # Try MongoDB first
-        leads_col = await get_leads_collection()
-        leads = await leads_col.find({}).to_list(100)
+        from Backend.connections.mongo_db import db
         
-        # Convert ObjectId to string for JSON serialization
-        for lead in leads:
-            lead["_id"] = str(lead["_id"])
-        
-        return {
-            "count": len(leads),
-            "leads": leads
-        }
+        if db is not None:
+            leads_col = db["leads"]
+            leads = list(leads_col.find({}))
+            
+            # Convert ObjectId to string for JSON serialization
+            for lead in leads:
+                lead["_id"] = str(lead["_id"])
+            
+            return {
+                "count": len(leads),
+                "leads": leads
+            }
+        else:
+            return {
+                "count": 0,
+                "leads": []
+            }
     
     except Exception as e:
         print(f"Error fetching leads: {e}")
@@ -180,22 +187,29 @@ async def get_all_leads():
 async def get_analytics():
     """Get all analytics events"""
     try:
-        analytics_col = await get_analytics_collection()
-        events = await analytics_col.find({}).to_list(100)
+        from Backend.connections.mongo_db import db
         
-        for event in events:
-            event["_id"] = str(event["_id"])
-        
-        return {
-            "count": len(events),
-            "events": events
-        }
+        if db is not None:
+            analytics_col = db["analytics"]
+            events = list(analytics_col.find({}))
+            
+            for event in events:
+                event["_id"] = str(event["_id"])
+            
+            return {
+                "count": len(events),
+                "events": events
+            }
+        else:
+            return {
+                "count": 0,
+                "events": []
+            }
     
     except Exception as e:
         print(f"Error fetching analytics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Health check
 @router.get("/health")
 async def api_health():
     return {"status": "ok", "api": "v1"}

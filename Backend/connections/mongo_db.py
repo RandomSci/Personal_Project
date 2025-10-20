@@ -47,11 +47,10 @@ def get_chats_collection():
         return db["chats"]
     return None
 
-# Insert operations
 def insert_lead_mongo(name: str, email: str, niche: str, problem: str):
     """Insert lead to MongoDB"""
     try:
-        if db:
+        if db is not None:
             leads = db["leads"]
             result = leads.insert_one({
                 "name": name,
@@ -68,7 +67,7 @@ def insert_lead_mongo(name: str, email: str, niche: str, problem: str):
 def get_all_leads_mongo():
     """Get all leads from MongoDB"""
     try:
-        if db:
+        if db is not None:
             leads = db["leads"]
             return list(leads.find({}).limit(100))
     except Exception as e:
