@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AutoMate AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Login Page */
+        .login-container {
+            display: none;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1f3a 100%);
+        }
+
+        .login-container.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .error-msg {
+            color: var(--error);
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dash-header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1f3a 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .dash-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            opacity: 0.9;
+        }
+
+        .dash-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards Grid */
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .card h2 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-size: 1.5rem;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .file-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .file-input-group input[type="file"] {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-danger {
+            background: var(--error);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-box .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f5f9;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .success-msg {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .dash-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>🔐 Admin Login</h1>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+                <div class="error-msg" id="errorMsg"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="dash-header">
+            <h1>📊 Admin Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="dash-content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('stats')">📈 Stats</button>
+                <button class="tab-btn" onclick="switchTab('projects')">🚀 Projects</button>
+                <button class="tab-btn" onclick="switchTab('leads')">👥 Leads</button>
+                <button class="tab-btn" onclick="switchTab('case-studies')">📊 Case Studies</button>
+                <button class="tab-btn" onclick="switchTab('analytics')">📉 Analytics</button>
+            </div>
+
+            <!-- Stats Tab -->
+            <div class="tab-content active" id="stats-tab">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="number" id="totalLeads">0</div>
+                        <div class="label">Total Leads</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="totalProjects">0</div>
+                        <div class="label">Projects</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="totalCaseStudies">0</div>
+                        <div class="label">Case Studies</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="totalEvents">0</div>
+                        <div class="label">Events Tracked</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Tab -->
+            <div class="tab-content" id="projects-tab">
+                <div class="card">
+                    <h2>Upload New Project</h2>
+                    <div class="success-msg" id="projectSuccess">✅ Project uploaded successfully!</div>
+                    <form onsubmit="handleProjectUpload(event)">
+                        <div class="form-group">
+                            <label for="projectName">Project Name</label>
+                            <input type="text" id="projectName" placeholder="My Awesome Project" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectDesc">Description</label>
+                            <textarea id="projectDesc" placeholder="Project description..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectUrl">Project URL</label>
+                            <input type="url" id="projectUrl" placeholder="https://example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectTech">Technology Stack</label>
+                            <input type="text" id="projectTech" placeholder="React, Node.js, MongoDB, etc." required>
+                        </div>
+                        <div class="file-input-group">
+                            <label for="projectImage">Project Image/Screenshot</label>
+                            <input type="file" id="projectImage" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Upload Project</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Your Projects</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Tech Stack</th>
+                                    <th>URL</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectsList">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--gray);">No projects yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leads Tab -->
+            <div class="tab-content" id="leads-tab">
+                <div class="card">
+                    <h2>All Leads</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Niche</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsList">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--gray);">Loading leads...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Studies Tab -->
+            <div class="tab-content" id="case-studies-tab">
+                <div class="card">
+                    <h2>Add New Case Study</h2>
+                    <div class="success-msg" id="caseSuccess">✅ Case study added successfully!</div>
+                    <form onsubmit="handleCaseStudyAdd(event)">
+                        <div class="form-group">
+                            <label for="caseMetric">Metric (e.g., "15 hrs")</label>
+                            <input type="text" id="caseMetric" placeholder="15 hrs" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="caseLabel">Label (e.g., "Time Saved Per Week")</label>
+                            <input type="text" id="caseLabel" placeholder="Time Saved Per Week" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="caseDesc">Description</label>
+                            <textarea id="caseDesc" placeholder="What did the client achieve?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Add Case Study</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Case Studies</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Label</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="caseStudiesList">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--gray);">No case studies yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics-tab">
+                <div class="card">
+                    <h2>User Interactions</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Button/Action</th>
+                                    <th>URL</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analyticsTable">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--gray);">Loading analytics...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize local storage for projects/case studies
+        const initializeData = () => {
+            if (!localStorage.getItem('projects')) {
+                localStorage.setItem('projects', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('caseStudies')) {
+                localStorage.setItem('caseStudies', JSON.stringify([]));
+            }
+        };
+
+        initializeData();
+
+        // Login handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Verify credentials
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    localStorage.setItem('adminToken', data.token);
+                    showDashboard();
+                    loadDashboardData();
+                } else {
+                    document.getElementById('errorMsg').textContent = '❌ Invalid credentials';
+                    document.getElementById('errorMsg').style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.log('Auth error:', err);
+                document.getElementById('errorMsg').textContent = '❌ Login failed';
+                document.getElementById('errorMsg').style.display = 'block';
+            });
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('loginContainer').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('adminToken');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginContainer').classList.add('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'leads') loadLeads();
+            if (tabName === 'analytics') loadAnalytics();
+        }
+
+        // Project upload
+        function handleProjectUpload(e) {
+            e.preventDefault();
+            
+            const project = {
+                id: Date.now(),
+                name: document.getElementById('projectName').value,
+                desc: document.getElementById('projectDesc').value,
+                url: document.getElementById('projectUrl').value,
+                tech: document.getElementById('projectTech').value,
+                createdAt: new Date().toLocaleString()
+            };
+
+            let projects = JSON.parse(localStorage.getItem('projects'));
+            projects.push(project);
+            localStorage.setItem('projects', JSON.stringify(projects));
+
+            document.getElementById('projectSuccess').style.display = 'block';
+            setTimeout(() => document.getElementById('projectSuccess').style.display = 'none', 3000);
+
+            e.target.reset();
+            updateProjectsList();
+            updateStats();
+        }
+
+        // Case study add
+        function handleCaseStudyAdd(e) {
+            e.preventDefault();
+
+            const caseStudy = {
+                id: Date.now(),
+                metric: document.getElementById('caseMetric').value,
+                label: document.getElementById('caseLabel').value,
+                desc: document.getElementById('caseDesc').value,
+                createdAt: new Date().toLocaleString()
+            };
+
+            let cases = JSON.parse(localStorage.getItem('caseStudies'));
+            cases.push(caseStudy);
+            localStorage.setItem('caseStudies', JSON.stringify(cases));
+
+            document.getElementById('caseSuccess').style.display = 'block';
+            setTimeout(() => document.getElementById('caseSuccess').style.display = 'none', 3000);
+
+            e.target.reset();
+            updateCaseStudiesList();
+            updateStats();
+        }
+
+        // Update projects list
+        function updateProjectsList() {
+            const projects = JSON.parse(localStorage.getItem('projects'));
+            const tbody = document.getElementById('projectsList');
+
+            if (projects.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No projects yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = projects.map(p => `
+                <tr>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.tech}</td>
+                    <td><a href="${p.url}" target="_blank" style="color: var(--primary);">View</a></td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteProject(${p.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update case studies list
+        function updateCaseStudiesList() {
+            const cases = JSON.parse(localStorage.getItem('caseStudies'));
+            const tbody = document.getElementById('caseStudiesList');
+
+            if (cases.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No case studies yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = cases.map(c => `
+                <tr>
+                    <td><strong>${c.metric}</strong></td>
+                    <td>${c.label}</td>
+                    <td>${c.desc.substring(0, 50)}...</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteCase(${c.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Delete project
+        function deleteProject(id) {
+            if (confirm('Delete this project?')) {
+                let projects = JSON.parse(localStorage.getItem('projects'));
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('projects', JSON.stringify(projects));
+                updateProjectsList();
+                updateStats();
+            }
+        }
+
+        // Delete case study
+        function deleteCase(id) {
+            if (confirm('Delete this case study?')) {
+                let cases = JSON.parse(localStorage.getItem('caseStudies'));
+                cases = cases.filter(c => c.id !== id);
+                localStorage.setItem('caseStudies', JSON.stringify(cases));
+                updateCaseStudiesList();
+                updateStats();
+            }
+        }
+
+        // Load leads
+        function loadLeads() {
+            fetch('/api/leads')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('leadsList');
+                    if (!data.leads || data.leads.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No leads yet</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = data.leads.map(lead => `
+                        <tr>
+                            <td>${lead.name}</td>
+                            <td>${lead.email}</td>
+                            <td>${lead.niche}</td>
+                            <td><span class="badge badge-success">Submitted</span></td>
+                            <td>${new Date(lead.created_at).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(err => console.log('Error loading leads:', err));
+        }
+
+        // Load analytics
+        function loadAnalytics() {
+            fetch('/api/analytics')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('analyticsTable');
+                    if (!data.events || data.events.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No events tracked</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = data.events.slice(-20).map(event => `
+                        <tr>
+                            <td>${event.name || event.event}</td>
+                            <td>${event.buttonText || event.data?.button || 'N/A'}</td>
+                            <td>${(event.url || '').substring(0, 40)}...</td>
+                            <td>${new Date(event.created_at || event.timestamp).toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(err => console.log('Error loading analytics:', err));
+        }
+
+        // Update stats
+        function updateStats() {
+            fetch('/api/leads')
+                .then(res => res.json())
+                .then(data => document.getElementById('totalLeads').textContent = data.count || 0)
+                .catch(err => console.log('Error:', err));
+
+            document.getElementById('totalProjects').textContent = JSON.parse(localStorage.getItem('projects')).length;
+            document.getElementById('totalCaseStudies').textContent = JSON.parse(localStorage.getItem('caseStudies')).length;
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            updateProjectsList();
+            updateCaseStudiesList();
+            updateStats();
+            loadLeads();
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('adminToken')) {
+                showDashboard();
+                loadDashboardData();
+            } else {
+                document.getElementById('loginContainer').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
