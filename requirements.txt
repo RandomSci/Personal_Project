@@ -18,3 +18,4 @@ email-validator
 APScheduler
 requests
 gunicorn
+jinja2
